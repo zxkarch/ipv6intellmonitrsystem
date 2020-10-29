@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="saiernet.server.srnserver.dao.userdao">
+
+    <resultMap id="users" type="saiernet.server.srnserver.entity.users">
+        <result property="id" column="id"/>
+        <result property="password" column="password"/>
+        <result property="username" column="username"/>
+    </resultMap>
+
+    <select id="selectUsersQuery" resultType="users">
+        select * from users
+    </select>
+    <select id="getUserbyToken" resultType="users">
+        select * from users
+        <where>
+            <if test="username != null and username.length() > 0">users.username= #{username}</if>
+            <if test="password != null and password.length() > 0">and users.password=#{password}</if>
+        </where>
+    </select>
+    <select id="getUserbyName" resultType="users">
+        select * from users
+        <where>
+            <if test="username != null and username.length() > 0">users.username= #{username}</if>
+        </where>
+    </select>
+    <insert id="addUser">
+        insert into users (username, password)
+        VALUE
+        (#{username},#{password})
+        <selectKey resultType="java.lang.Integer" keyProperty="id" >
+            SELECT @@IDENTITY AS ID
+        </selectKey>
+    </insert>
+
+</mapper>

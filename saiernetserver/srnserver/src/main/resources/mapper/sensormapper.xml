@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="saiernet.server.srnserver.dao.sensordao">
+
+    <resultMap id="devices" type="saiernet.server.srnserver.entity.devices">
+        <result property="id" column="id"/>
+        <result property="devicename" column="devicename"/>
+        <result property="typenote" column="typenote"/>
+        <result property="showtype" column="showtype"/>
+        <result property="unit" column="unit"/>
+    </resultMap>
+
+    <resultMap id="recordlist" type="saiernet.server.srnserver.entity.recordlist">
+        <result property="id" column="id"/>
+        <result property="iddev" column="iddev"/>
+        <result property="rtime" column="rtime"/>
+        <result property="rvalue" column="rvalue"/>
+        <result property="imgurl" column="imgurl"/>
+    </resultMap>
+
+    <resultMap id="sensorlastvalues" type="saiernet.server.srnserver.entity.sensorlastvalues">
+        <result property="id" column="id"/>
+        <result property="devicename" column="devicename"/>
+        <result property="typenote" column="typenote"/>
+        <result property="showtype" column="showtype"/>
+        <result property="rltime" column="rltime"/>
+        <result property="rvalue" column="rvalue"/>
+        <result property="imgurl" column="imgurl"/>
+    </resultMap>
+
+    <select id="selectAllSensorQuery" resultType="sensorlastvalues">
+        select * from sensorlatestvals
+    </select>
+
+    <select id="selectCameraByTypeQuery" resultType="sensorlastvalues">
+        select * from sensorlatestvals
+        <where>
+            <if test="showtype!=0">sensorlatestvals.showtype= #{showtype}</if>
+        </where>
+    </select>
+
+    <insert id="insertSensorDatainBatch" parameterType="java.util.List">
+        insert into recordlist (iddev, rtime, rvalue, imgurl)
+        values
+        <foreach collection="sensorlist" item="sensor" separator =",">
+            (#{sensor.iddev},#{sensor.rtime},#{sensor.rvalue},#{sensor.imgurl})
+        </foreach>
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <select id="selectSensorIdbyNameType" resultType="java.lang.Integer">
+        select id from devices
+        <where>
+            <if test="devicename!=null">devices.devicename=#{devicename} </if>
+            <if test="typenote!=null">and devices.typenote=#{typenote}</if>
+        </where>
+    </select>
+
+    <insert id="insertSensorData" parameterType="saiernet.server.srnserver.entity.recordlist">
+        insert into recordlist (iddev, rtime, rvalue, imgurl)
+        values (#{rec.iddev},#{rec.rtime},#{rec.rvalue},#{rec.imgurl})
+        <selectKey resultType="java.lang.Integer" keyProperty="id" >
+            SELECT @@IDENTITY AS ID
+        </selectKey>
+    </insert>
+
+</mapper>
